@@ -5,6 +5,32 @@ namespace OneOf.Tests {
 
 	public interface IJwOf { object Value { get; } }
 
+	public struct WkOf<T0, T1> : IJwOf {
+
+		readonly object value;
+		readonly int index;
+
+		object IJwOf.Value => value;
+
+		public object GetValue() {
+			return value;
+		}
+
+		WkOf(object value, int index) {
+			this.value = value;
+			this.index = index;
+		}
+
+		public static implicit operator WkOf<T0, T1>(T0 t) {
+			return new WkOf<T0, T1>(t, 0);
+		}
+
+		public static implicit operator WkOf<T0, T1>(T1 t) {
+			return new WkOf<T0, T1>(t, 1);
+		}
+
+	}
+
 	public struct JwOf<T0, T1> : IJwOf {
 
 		readonly object value;
@@ -84,13 +110,24 @@ namespace OneOf.Tests {
 
 	public class CopySpec {
 
-		public JwOf<int, double> GetValue() {
+		public JwOf<int, double> GetJwValue() {
 			return 100.0 / 10.0;
 		}
 
+		public WkOf<int, double> GetWkValue() {
+			//return 100.0 / 10.0;
+			return 10;
+		}
+
 		[Test]
-		public void ShouldGetValue() {
-			var rs = GetValue();
+		public void ShouldGetWkValue() {
+			var rs = GetWkValue();
+			Assert.AreEqual(10, rs.GetValue());
+		}
+
+		[Test]
+		public void ShoudGetJwValue() {
+			var rs = GetJwValue();
 			rs.Match(
 				intValue => {
 					Assert.Fail();
